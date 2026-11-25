@@ -1,0 +1,30 @@
+name: Academy Engine
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  engine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install
+      - run: npx tsc --strict --skipLibCheck --esModuleInterop --module commonjs --target es2020 --outDir /tmp/academy-engine lib/academy-engine/contracts.ts lib/academy-engine/engine.ts tests/academy-engine.test.ts
+      - run: node --test /tmp/academy-engine/tests/academy-engine.test.js
+      - name: Full production build
+        run: npm run build
+      - name: Dependency security gate
+        if: always()
+        run: npm audit --audit-level=high
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: resolved-lockfile
+          path: package-lock.json
