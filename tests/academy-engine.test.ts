@@ -18,3 +18,8 @@ test('unknown role',()=>assert.equal(orchestrate({...base,role:'unknown'}).statu
 test('null input',()=>assert.equal(orchestrate(null).status,'error'));
 test('unknown module',()=>assert.equal(orchestrate({...base,module_id:'02'}).status,'needs_input'));
 test('journey',()=>{assert.equal(orchestrate(base).status,'ok');assert.equal(orchestrate({...base,role:'tutor'}).status,'ok');assert.equal(orchestrate({...base,role:'avaliador'},evidence).assessment?.decision,'pass');});
+
+test('malformed reviewer evidence',()=>assert.equal(orchestrate({...base,role:'avaliador'},null as unknown as Evidence[]).status,'error'));
+test('partial unsafe evidence requires revision',()=>assert.equal(orchestrate({...base,role:'avaliador'},[{criterion:'safety',score:0,reference:'fixture:safety',rationale:'unsafe'}]).assessment?.decision,'revise'));
+test('unsafe request id not echoed',()=>assert.equal(orchestrate({...base,request_id:'cpf: 12345678900'}).request_id,''));
+test('array input rejected',()=>assert.equal(orchestrate([]).status,'error'));
