@@ -1,0 +1,15 @@
+name: Academy Engine
+on:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  engine:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install
+      - run: npx tsc --strict --skipLibCheck --esModuleInterop --module commonjs --target es2020 --outDir /tmp/academy-engine lib/academy-engine/contracts.ts lib/academy-engine/engine.ts tests/academy-engine.test.ts
+      - run: node --test /tmp/academy-engine/tests/academy-engine.test.js
