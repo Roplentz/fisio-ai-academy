@@ -13,7 +13,7 @@ export function avaliador(r: Request, reviewedEvidence: readonly Evidence[] = []
  if(!Array.isArray(reviewedEvidence)) return response(r.request_id,'error','Evidências inválidas.','Revisar evidências.');
  const scores = Object.fromEntries(criteria.map(c=>[c,null])) as Assessment['scores'];
  const refs: string[] = [];
- for(const e of reviewedEvidence){
+ for(const e of reviewedEvidence as readonly Evidence[]){
   if(!e || !criteria.includes(e.criterion) || ![0,1,2].includes(e.score) || typeof e.reference!=='string' || !e.reference.trim() || typeof e.rationale!=='string' || !e.rationale.trim() || scores[e.criterion]!==null) return response(r.request_id,'error','Evidência inválida ou duplicada.','Revisar evidências.');
   scores[e.criterion]=e.score; refs.push(e.reference);
  }
